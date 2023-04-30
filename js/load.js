@@ -231,10 +231,11 @@ let load = async (token) => {
         // Get the dom element from the message
         let message = document
             .getElementById(m.id)
-            .querySelector('.messageText');
-        message.innerHTML = `${parseMessage(
-            m.cleanContent
-        )} <time class='edited'>(edited)</time>`;
+            ?.querySelector('.messageText');
+        if (message)
+            message.innerHTML = `${parseMessage(
+                m.cleanContent
+            )} <time class='edited'>(edited)</time>`;
     });
 
     // New message recieved
@@ -245,13 +246,7 @@ let load = async (token) => {
             m.author.received = true;
 
             // If the message was sent to the selected channel
-            if (m.channel.id == selectedChan?.id) {
-                // document.getElementById('message-list').removeChild(document.getElementById('message-list').firstChild);
-                let previousMessage;
-                fetchLast(previousMessage);
-
-                return;
-            }
+            if (m.channel.id == selectedChan?.id) return fetchLast();
         }
         // If there is a channel selected in the current guild
         else if (selectedGuild && m.guild.id == selectedGuild.id) {
@@ -266,17 +261,16 @@ let load = async (token) => {
         }
 
         // If the message was sent to the selected channel
-        if (selectedChan && m.channel.id == selectedChan.id) {
-            // document.getElementById('message-list').removeChild(document.getElementById('message-list').firstChild);
-            let previousMessage;
-            fetchLast(previousMessage);
-        }
+        if (selectedChan && m.channel.id == selectedChan.id) fetchLast();
 
         // Get last message in channel
-        async function fetchLast(previousMessage) {
-            await m.channel.messages.fetch({ limit: 2 }).then((msg) => {
-                previousMessage = msg.toJSON()[1];
-            });
+        async function fetchLast() {
+            let previousMessage = m.channel.messages.cache.at(-2);
+            if (!previousMessage) {
+                await m.channel.messages
+                    .fetch({ limit: 2 })
+                    .then((messages) => (previousMessage = messages.at(1)));
+            }
 
             let scroll = false;
             if (
@@ -359,10 +353,12 @@ function removeMessage(message, firstMessage) {
             if (embed) message.removeChild(embed);
             if (text) message.removeChild(text);
 
-            message.innerHTML += nextElement.innerHTML;
-            message.id = nextElement.id;
+            if (nextElement) {
+                message.innerHTML += nextElement.innerHTML;
+                message.id = nextElement.id;
 
-            message.parentElement.removeChild(nextElement);
+                message.parentElement.removeChild(nextElement);
+            } else message.parentElement.parentElement.removeChild(message.parentElement);
         } else {
             message.parentElement.removeChild(message);
         }

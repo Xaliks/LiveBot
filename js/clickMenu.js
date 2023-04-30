@@ -164,8 +164,10 @@ function newBreak() {
 }
 
 // Build the menu for right clicking messages
-function buildMsgMenu(target) {
-    let message = selectedChan.messages.cache.get(target.id);
+async function buildMsgMenu(target) {
+    let message = await selectedChan.messages.fetch(target.id).catch(() => null);
+    if (!message) return;
+
     let menu = document.getElementById('rcMenu');
 
     // Check permissions

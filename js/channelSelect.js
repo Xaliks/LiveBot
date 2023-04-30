@@ -23,43 +23,16 @@ let channelSelect = (c, name) => {
         return;
     }
 
-    if (generatingMessages) {
-        return;
-    }
-
     selectedChan = c;
-    selectedChanDiv = name;
-    name.style.color = '#eee';
-    messageCreate();
 
-    // Refresh the typing indicator
-    typingStatus(true);
+    if (name) {
+        selectedChanDiv = name;
+        name.style.color = '#eee';
 
-    // Set the message bar placeholder
-    document.getElementById('msgbox').placeholder = `Message #${c.name}`;
+        // Remove the notification class
+        name.classList.remove('newMsg');
 
-    // Remove the notification class
-    name.classList.remove('newMsg');
-
-    // Clear the messages
-    while (messages.firstChild) {
-        messages.removeChild(messages.firstChild);
-    }
-
-    // Creates the loading dots
-    var container = document.createElement('div'); // Centred container
-    var loadingDots = document.createElement('div'); // Loading dots
-    loadingDots.classList.add('dot-bricks');
-    container.style.position = 'absolute';
-    container.style.top = '50%';
-    container.style.left = '50%';
-    container.style.transform = 'translate(-50%, -50%)';
-    container.id = 'loading-container';
-    container.appendChild(loadingDots);
-    messages.appendChild(container);
-
-    // Set colour of the channel
-    try {
+        // Set color of the channel
         selectedChanDiv.style.color = '#606266';
         name.addEventListener('mouseover', () => {
             if (name.style.color != 'rgb(238, 238, 238)') {
@@ -72,35 +45,56 @@ let channelSelect = (c, name) => {
                 name.style.color = '#606266';
             }
         });
-    } catch (err) {
-        console.log(err);
     }
 
+    // Clear the messages
+    messages.replaceChildren();
+
+    // Add new messages
+    fetchMessages();
+
+    // Refresh the typing indicator
+    typingStatus(true);
+
+    // Set the message bar placeholder
+    document.getElementById('msgbox').placeholder = `Message #${
+        c.recipient?.username || c.name
+    }`;
+
+    // Creates the loading dots
+    let container = document.createElement('div'); // Centred container
+    let loadingDots = document.createElement('div'); // Loading dots
+    loadingDots.classList.add('dot-bricks');
+    container.style.position = 'absolute';
+    container.style.top = '50%';
+    container.style.left = '50%';
+    container.style.transform = 'translate(-50%, -50%)';
+    container.id = 'loading-container';
+    container.appendChild(loadingDots);
+    messages.appendChild(container);
+
     // Create the member list
-    addMemberList(c.guild);
+    if (c.type != Discord.ChannelType.DM) addMemberList(c.guild);
 
     // Create message
-    async function messageCreate() {
-        generatingMessages = true;
+    async function fetchMessages() {
         // Loop through messages
-        let count = 0;
-        await c.messages.fetch({ limit: fetchSize }).then((messages) => {
+        await c.messages.fetch({ limit: fetchSize }).then((messages) =>
             messages
                 .toJSON()
                 .reverse()
-                .forEach((m) => {
-                    count++;
-                    let message = generateMsgHTML(
-                        m,
-                        messages.toJSON().reverse()[count - 2],
-                        count,
-                        fetchSize
+                .forEach((message, index, messages) => {
+                    let generatedHTML = generateMsgHTML(
+                        message,
+                        index ? messages.at(index - 1) : null
                     );
+
                     document
                         .getElementById('message-list')
-                        .appendChild(message);
-                });
-        });
+                        .appendChild(generatedHTML);
+                })
+        );
+
         // Add the no load apology
         let shell = document.createElement('div');
         shell.classList.add('sorryNoLoad');
@@ -111,27 +105,18 @@ let channelSelect = (c, name) => {
         document.getElementById('message-list').prepend(shell);
 
         messages.scrollTop = messages.scrollHeight;
-        generatingMessages = false;
 
         // Remove the loading dots
         messages.removeChild(document.getElementById('loading-container'));
     }
 };
 
-let dmChannelSelect = async (u, name = 'test') => {
+let dmChannelSelect = async (u) => {
     if (u.bot || bot.user == u) return;
-    let messages = document.getElementById('message-list');
-    let fetchSize = 100;
-
-    if (!u.dmChannel) {
-        await u.createDM();
-    }
 
     let c = u.dmChannel;
+    if (!c) c = await u.createDM();
 
-    if (generatingMessages) {
-        return;
-    }
     if (!u.openDM) u.openDM = true;
 
     if (selectedChatDiv) {
@@ -139,55 +124,5 @@ let dmChannelSelect = async (u, name = 'test') => {
         selectedChatDiv = undefined;
     }
 
-    selectedChan = c;
-
-    messageCreate();
-
-    // Refresh the typing indicator
-    typingStatus(true);
-
-    // Set the message bar placeholder
-    document.getElementById(
-        'msgbox'
-    ).placeholder = `Message #${c.recipient.username}`;
-
-    // Clear the messages
-    while (messages.firstChild) {
-        messages.removeChild(messages.firstChild);
-    }
-
-    // Create message
-    async function messageCreate() {
-        generatingMessages = true;
-        // Loop through messages
-        let count = 0;
-        await c.messages.fetch({ limit: fetchSize }).then((messages) => {
-            messages
-                .toJSON()
-                .reverse()
-                .forEach((m) => {
-                    count++;
-                    let message = generateMsgHTML(
-                        m,
-                        messages.toJSON().reverse()[count - 2],
-                        count,
-                        fetchSize
-                    );
-                    document
-                        .getElementById('message-list')
-                        .appendChild(message);
-                });
-        });
-        // Add the no load apology
-        let shell = document.createElement('div');
-        shell.classList.add('sorryNoLoad');
-        let text = document.createElement('p');
-        text.innerText =
-            'Sorry! No messages beyond this point can be displayed.';
-        shell.appendChild(text);
-        document.getElementById('message-list').prepend(shell);
-
-        messages.scrollTop = messages.scrollHeight;
-        generatingMessages = false;
-    }
+    channelSelect(c, selectedChatDiv);
 };

@@ -25,7 +25,6 @@ let selectedChanDiv;
 let selectedVoice;
 let selectedChatDiv;
 let oldimg;
-let generatingMessages = false;
 let barry = false;
 
 // Disable the security warning from electron that comes from using an uncompiled version

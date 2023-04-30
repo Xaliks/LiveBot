@@ -18,7 +18,7 @@ async function addMemberList(guild) {
     const listDiv = document.getElementById('memberBar');
 
     // Clear members list
-    listDiv.innerHTML = '';
+    listDiv.replaceChildren();
 
     if (!selectedChan) return;
 

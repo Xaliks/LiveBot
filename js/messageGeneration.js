@@ -14,136 +14,124 @@
 
 'use strict';
 
-function findTimeDiff(m, previousMessage, count) {
-    let bunch = false;
-    let timebunch = false;
+function generateMsgHTML(message, previousMessage) {
+    const messageList = document.getElementById('message-list');
+    let messagesContainer;
 
-    if (previousMessage && previousMessage.author.id == m.author.id) {
-        bunch = true;
+    // Create message container
+    let messageContainer = document.createElement('div');
+    messageContainer.classList.add('messageBlock');
+    messageContainer.id = message.id;
 
-        if (
-            Math.floor(
-                previousMessage.createdTimestamp / 1000 / 60 / 60 / 24
-            ) != Math.floor(m.createdTimestamp / 1000 / 60 / 60 / 24)
-        ) {
-            bunch = false;
-            timebunch = true;
-        }
-    } else {
-        bunch = false;
-    }
+    // Check if message needs to be separated from previous message
+    if (
+        message.author.id != previousMessage?.author.id ||
+        message.createdTimestamp - previousMessage.createdTimestamp >=
+            7 * 60_000
+    ) {
+        messageContainer.classList.add('firstmsg');
 
-    return [bunch, timebunch];
-}
+        // Create author's messages container
+        messagesContainer = document.createElement('div');
+        messagesContainer.classList.add('messageCont');
+        messagesContainer.id = message.author.id;
+        if (message.channel.type == Discord.ChannelType.DM)
+            messagesContainer.classList.add('dms');
+        messageList.appendChild(messagesContainer);
 
-function generateMsgHTML(
-    m,
-    previousMessage,
-    count = -1,
-    fetchSize = undefined
-) {
-    // Check if the messages should be grouped or not
-    let result = [false, false];
-    if (count == -1 || (count > 2 && count <= fetchSize)) {
-        result = findTimeDiff(m, previousMessage);
-    }
-
-    // The bunched values
-    let bunch = result[0];
-    let timebunch = result[1];
-
-    // Create the div for the dark background
-    let darkBG = document.createElement('div');
-    darkBG.classList.add('messageBlock');
-    darkBG.id = m.id;
-
-    // Create the messages
-    let div;
-    if (!bunch) {
-        // Create message div
-        div = document.createElement('div');
-        div.classList.add('messageCont');
-        div.classList.add(m.author.id);
-        if (m.channel.type == Discord.ChannelType.DM) div.classList.add('dms');
-        if (timebunch) {
-            div.classList.add('timeSeparated');
-        }
-
-        // Inline message container
-        // messageContainer = document.createElement("div");
-        // messageContainer.classList.add(m.author.id);
-        // messageContainer.classList.add('inlineMsgCont');
-        // div.appendChild(messageContainer);
-
-        // Create the dark background
-        darkBG.classList.add('firstmsg');
-        div.appendChild(darkBG);
-
-        // Create user image
+        // Create user's avatar
         let img = document.createElement('img');
-        let userImg = (m.member || m.author).displayAvatarURL({ size: 64 });
-        if (m.author.avatar && m.author.avatar.startsWith('a_')) {
-            let userGif = m.author.displayAvatarURL({ size: 128 });
-            img.src = userGif;
-            darkBG.onmouseenter = (e) => {
-                img.src = userGif;
-            };
-            darkBG.onmouseleave = (e) => {
-                img.src = userImg;
-            };
-        }
         img.classList.add('messageImg');
-        img.src = userImg;
         img.height = '40';
         img.width = '40';
-        darkBG.appendChild(img);
+        img.src = (message.member || message.author).displayAvatarURL({
+            size: 64,
+            forceStatic: true,
+        });
+        messagesContainer.onmouseenter = (e) => {
+            img.src = (message.member || message.author).displayAvatarURL({
+                size: 64,
+            });
+        };
+        messagesContainer.onmouseleave = (e) => {
+            img.src = (message.member || message.author).displayAvatarURL({
+                size: 64,
+                forceStatic: true,
+            });
+        };
+        messageContainer.appendChild(img);
 
-        // Create user's name
+        // Create user's nickname
         let name = document.createElement('p');
-        name.innerText = m.member?.nickname || m.author.username;
+        name.innerText = message.member?.nickname || message.author.username;
         name.classList.add('messageUsername');
 
-        // Find the colour of their name
-        // Use the highest role for their color
-        name.style.color = m.member?.roles.color?.hexColor || '#fff';
+        // Use the highest role for nickname color
+        name.style.color = message.member?.roles.color?.hexColor || '#fff';
 
-        darkBG.appendChild(name);
+        messageContainer.appendChild(name);
 
         // Create timestamp
         let timestamp = document.createElement('p');
-        timestamp.innerText =
-            ' ' +
-            m.createdAt.toLocaleString('en-US', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-            });
         timestamp.classList.add('messageTimestamp');
-        darkBG.appendChild(timestamp);
-    } else {
-        div = document.getElementsByClassName(m.author.id);
-        div = div[div.length - 1];
-        div.appendChild(darkBG);
+        let yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        // Check if message is created today
+        if (new Date().toDateString() === message.createdAt.toDateString()) {
+            timestamp.innerText = ` Today at ${message.createdAt.toLocaleString(
+                'en-US',
+                {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                }
+            )}`;
+        }
+        // Check if message is created yesterday
+        else if (
+            yesterday.toDateString() === message.createdAt.toDateString()
+        ) {
+            timestamp.innerText = ` Yesterday at ${message.createdAt.toLocaleString(
+                'en-US',
+                {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                }
+            )}`;
+        } else {
+            timestamp.innerText =
+                ' ' +
+                message.createdAt.toLocaleString('en-US', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                });
+        }
+        messageContainer.appendChild(timestamp);
     }
+    messagesContainer = [
+        ...messageList.querySelectorAll(`[id='${message.author.id}']`),
+    ].at(-1);
 
-    // Prepend message text
-    if (m.cleanContent.length) {
+    messagesContainer.appendChild(messageContainer);
+
+    if (message.cleanContent.length) {
         // Render message text
         let text = document.createElement('p');
         text.classList.add('messageText');
-        text.innerHTML = parseMessage(m.cleanContent, m, false);
+        text.innerHTML = parseMessage(message.cleanContent, message, false);
 
-        if (m.editedAt)
+        if (message.editedAt)
             text.innerHTML += '<time class="edited"> (edited)</time>';
 
-        darkBG.appendChild(text);
+        messageContainer.appendChild(text);
     }
 
-    // Append embeds
-    m.embeds.forEach((embed) => {
-        showEmbed(embed.data, darkBG, m);
+    // Show embeds
+    message.embeds.forEach((embed) => {
+        showEmbed(embed.data, messageContainer, message);
     });
-    return div;
+
+    return messagesContainer;
 }
