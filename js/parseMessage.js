@@ -12,190 +12,158 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-'use strict';
+"use strict";
 
 let parseSend = (text) => {
-    // The regex used for the emojis
-    let emojiRegex =
-        /(?<!\S)(>:\(|>:-\(|>=\(|>=-\(|:"\)|:-"\)|="\)|=-"\)|<\/3|:-\\|:-\/|=-\\|=-\/|:'\(|:'-\(|:,\(|:,-\(|='\(|='-\(|=,\(|=,-\(|:\(|:-\(|=\(|=-\(|<3|♡|]:\(|\]:-\(|]=\(|]=-\(|o:\)|O:\)|o:-\)|O:-\)|0:\)|0:-\)|o=\)|O=\)|o=-\)|O=-\)|0=\)|0=-\)|:'D|:'-D|:,D|:,-D|='D|='-D|=,D|=,-D|:\*|:-\*|=\*|=-\*|x-\)|X-\)|:\||:-\||=\||=-\||:o|:-o|:O|:-O|=o|=-o|=O|=-O|:@|:-@|=@|=-@|:D|:-D|=D|=-D|:'\)|:'-\)|:,\)|:,-\)|='\)|='-\)|=,\)|=,-\)|:\)|:-\)|=\)|=-\)|]:\)|]:-\)|]=\)|]=-\)|:,'\(|:,'-\(|;\(|;-\(|=,'\(|=,'-\(|:P|:-P|=P|=-P|8-\)|B-\)|,:\(|,:-\(|,=\(|,=-\(|,:\)|,:-\)|,=\)|,=-\)|:s|:-S|:z|:-Z|:\$|:-\$|=s|=-S|=z|=-Z|=\$|=-\$|;\)|;-\))(?!\S)/gm;
+	// The regex used for the emojis
+	let emojiRegex =
+		/(?<!\S)(>:\(|>:-\(|>=\(|>=-\(|:"\)|:-"\)|="\)|=-"\)|<\/3|:-\\|:-\/|=-\\|=-\/|:'\(|:'-\(|:,\(|:,-\(|='\(|='-\(|=,\(|=,-\(|:\(|:-\(|=\(|=-\(|<3|♡|]:\(|\]:-\(|]=\(|]=-\(|o:\)|O:\)|o:-\)|O:-\)|0:\)|0:-\)|o=\)|O=\)|o=-\)|O=-\)|0=\)|0=-\)|:'D|:'-D|:,D|:,-D|='D|='-D|=,D|=,-D|:\*|:-\*|=\*|=-\*|x-\)|X-\)|:\||:-\||=\||=-\||:o|:-o|:O|:-O|=o|=-o|=O|=-O|:@|:-@|=@|=-@|:D|:-D|=D|=-D|:'\)|:'-\)|:,\)|:,-\)|='\)|='-\)|=,\)|=,-\)|:\)|:-\)|=\)|=-\)|]:\)|]:-\)|]=\)|]=-\)|:,'\(|:,'-\(|;\(|;-\(|=,'\(|=,'-\(|:P|:-P|=P|=-P|8-\)|B-\)|,:\(|,:-\(|,=\(|,=-\(|,:\)|,:-\)|,=\)|,=-\)|:s|:-S|:z|:-Z|:\$|:-\$|=s|=-S|=z|=-Z|=\$|=-\$|;\)|;-\))(?!\S)/gm;
 
-    // Replace all the shortcuts with actual emojis
-    text = text.replace(emojiRegex, (a) => {
-        let shortcut = shortcuts.find((s) => s.face === a);
-        if (shortcut) return idToUni[shortcut.id];
-        return a;
-    });
+	// Replace all the shortcuts with actual emojis
+	text = text.replace(emojiRegex, (a) => {
+		let shortcut = shortcuts.find((s) => s.face === a);
+		if (shortcut) return idToUni[shortcut.id];
+		return a;
+	});
 
-    text = text.replace(/:(.*):/gm, (a, b) => {
-        let shortcut = idToUni[b];
-        if (shortcut) return shortcut;
-        return a;
-    });
+	text = text.replace(/:(.*):/gm, (a, b) => {
+		let shortcut = idToUni[b];
+		if (shortcut) return shortcut;
+		return a;
+	});
 
-    let customEmojiRegex = /^:([\d\w]+):|[^<]:([\d\w]+):/gm;
-    text = text.replaceAll('::', ': :').replaceAll(customEmojiRegex, (name) => {
-        console.log(name);
-        if (name[1] === ':')
-            return (
-                name[0] +
-                bot.emojis.cache
-                    .find((emoji) => emoji.name == name.slice(2, -1))
-                    .toString()
-            );
-        else
-            return bot.emojis.cache
-                .find((emoji) => emoji.name == name.slice(1, -1))
-                .toString();
-    });
+	let customEmojiRegex = /^:([\d\w]+):|[^<]:([\d\w]+):/gm;
+	text = text.replaceAll("::", ": :").replaceAll(customEmojiRegex, (name) => {
+		console.log(name);
+		if (name[1] === ":") return name[0] + bot.emojis.cache.find((emoji) => emoji.name === name.slice(2, -1)).toString();
+		return bot.emojis.cache.find((emoji) => emoji.name === name.slice(1, -1)).toString();
+	});
 
-    return text;
+	return text;
 };
 
-let parseMessage = (
-    text,
-    msg = null,
-    embed = false,
-    ping = false,
-    embeddedLink
-) => {
-    let textContent = text;
+let parseMessage = (text, msg = null, embed = false, ping = false, embeddedLink) => {
+	let textContent = text;
 
-    // Remove html <, > and & in the message
-    textContent = parseHTML(textContent);
+	// Remove html <, > and & in the message
+	textContent = parseHTML(textContent);
 
-    // General message parsing
-    // Format pings
-    if (msg) parsePings(msg, textContent, embeddedLink, ping, embed);
-    // Match links
-    textContent = parseLinks(textContent);
-    // Add html tags for markup
-    textContent = parseStyling(textContent, embed);
-    // Match all emojis
-    textContent = parseUnicodeEmojis(textContent);
-    // Render custom emojis
-    textContent = parseCustomEmojis(textContent);
-    // Parse the emojis to SVGs
-    textContent = twemoji.parse(textContent);
+	// General message parsing
+	// Format pings
+	if (msg) parsePings(msg, textContent, embeddedLink, ping, embed);
+	// Match links
+	textContent = parseLinks(textContent);
+	// Add html tags for markup
+	textContent = parseStyling(textContent, embed);
+	// Match all emojis
+	textContent = parseUnicodeEmojis(textContent);
+	// Render custom emojis
+	textContent = parseCustomEmojis(textContent);
+	// Parse the emojis to SVGs
+	textContent = twemoji.parse(textContent);
 
-    return textContent;
+	return textContent;
 };
 
 function discoverSpoiler(spoiler) {
-    spoiler.classList.toggle('discovered');
+	spoiler.classList.toggle("discovered");
 }
 
 // Ping formatting
 function formatPings(msg, text, dms) {
-    let textContent = text;
-    let keys = [];
+	let textContent = text;
+	let keys = [];
 
-    // Get all the mentions from users, roles and channels
-    msg.mentions.users.each((user) => keys.push([user.id, 'user']));
-    msg.mentions.roles.each((role) => keys.push([role.id, 'role']));
-    msg.mentions.channels.each((channel) => keys.push([channel.id, 'channel']));
+	// Get all the mentions from users, roles and channels
+	msg.mentions.users.each((user) => keys.push([user.id, "user"]));
+	msg.mentions.roles.each((role) => keys.push([role.id, "role"]));
+	msg.mentions.channels.each((channel) => keys.push([channel.id, "channel"]));
 
-    // Replace the ping with a span container
-    keys.forEach((ping) => {
-        let id = ping[0];
-        let type = ping[1];
+	// Replace the ping with a span container
+	keys.forEach((ping) => {
+		let [id, type] = ping;
 
-        let name = '';
-        let color = 0;
-        if (type == 'user') {
-            let user = dms
-                ? bot.users.cache.get(id)
-                : msg.guild.members.cache.get(id);
-            name = user?.displayName || user?.username || id;
-        } else if (type == 'role' && !dms) {
-            let role = msg.guild.roles.cache.get(id);
-            name = role ? role.name : id;
-            color = role.color ? role.color.toString(16) : 0;
-            color = color ? '#' + '0'.repeat(6 - color.length) + color : 0;
-        } else if (type == 'channel' && !dms) {
-            let channel = msg.guild.channels.cache.get(id);
-            name = channel ? channel.name : 'deleted-channel';
-        } else {
-            name = id;
-        }
+		let name = "";
+		let color = 0;
+		if (type === "user") {
+			let user = dms ? bot.users.cache.get(id) : msg.guild.members.cache.get(id);
+			name = user?.displayName || user?.username || id;
+		} else if (type === "role" && !dms) {
+			let role = msg.guild.roles.cache.get(id);
+			name = role ? role.name : id;
+			color = role.color ? role.color.toString(16) : 0;
+			color = color ? `#${"0".repeat(6 - color.length)}${color}` : 0;
+		} else if (type === "channel" && !dms) {
+			let channel = msg.guild.channels.cache.get(id);
+			name = channel ? channel.name : "deleted-channel";
+		} else {
+			name = id;
+		}
 
-        name = name
-            .replace(/(\[|\]|\(|\)|\\)/gm, (a) => '\\' + a)
-            .replace(/\*/gm, '\\*');
-        let pingRegex = new RegExp(`(?:(<|>)?@!?(${name}))`, 'g');
-        let channelRegex = new RegExp(`(?:(<|>)?#(${name}))`, 'g');
-        textContent = textContent.replace(pingRegex, (a, b, c) =>
-            b == '<' || b == '>'
-                ? a
-                : `<span class="ping" ${id}" ${
-                      color ? `style="color: ${color}"` : ''
-                  }>@${c.replace(/\*/gm, '&#42')}</span>`
-        );
-        if (!dms) {
-            textContent = textContent.replace(channelRegex, (a, b, c) =>
-                b == '<' || b == '>'
-                    ? a
-                    : `<span class="ping ${id}">#${c.replace(
-                          /\*/gm,
-                          '&#42'
-                      )}</span>`
-            );
-        }
-    });
-    return textContent;
+		name = name.replace(/(\[|\]|\(|\)|\\)/gm, (a) => `\\${a}`).replace(/\*/gm, "\\*");
+		let pingRegex = new RegExp(`(?:(<|>)?@!?(${name}))`, "g");
+		let channelRegex = new RegExp(`(?:(<|>)?#(${name}))`, "g");
+		textContent = textContent.replace(pingRegex, (a, b, c) =>
+			b === "<" || b === ">"
+				? a
+				: `<span class="ping" ${id}" ${color ? `style="color: ${color}"` : ""}>@${c.replace(/\*/gm, "&#42")}</span>`,
+		);
+		if (!dms) {
+			textContent = textContent.replace(channelRegex, (a, b, c) =>
+				b === "<" || b === ">" ? a : `<span class="ping ${id}">#${c.replace(/\*/gm, "&#42")}</span>`,
+			);
+		}
+	});
+	return textContent;
 }
 
 function formatEmbedPings(msg, text, dms) {
-    let textContent = text;
-    // console.log(text)
-    let keys = [];
+	let textContent = text;
+	// console.log(text)
+	let keys = [];
 
-    // Replace user/role pings
-    text.replace(/&lt;@(!?[0-9]+)&gt;/gm, (a, id) => keys.push(id));
+	// Replace user/role pings
+	text.replace(/&lt;@(!?[0-9]+)&gt;/gm, (a, id) => keys.push(id));
 
-    // Replace channel pings
-    text.replace(/&lt;#(\d+)&gt;/gm, (a, id) => keys.push(id));
+	// Replace channel pings
+	text.replace(/&lt;#(\d+)&gt;/gm, (a, id) => keys.push(id));
 
-    // Replace the ping with a span container
-    keys.forEach((id) => {
-        let name = '';
-        let chanName = '';
-        let color = 0;
+	// Replace the ping with a span container
+	keys.forEach((id) => {
+		let name = "";
+		let chanName = "";
+		let color = 0;
 
-        let user = dms
-            ? bot.users.cache.get(id.replace(/!/, ''))
-            : msg.guild.members.cache.get(id.replace(/!/, ''));
-        name = user?.displayName || user?.username || id;
+		let user = dms ? bot.users.cache.get(id.replace(/!/, "")) : msg.guild.members.cache.get(id.replace(/!/, ""));
+		name = user?.displayName || user?.username || id;
 
-        if (name == id && !dms) {
-            let role = msg.guild.roles.cache.get(id);
-            name = role ? role.name : id;
-            color = role ? (role.color ? role.color.toString(16) : 0) : 0;
-            color = color ? '#' + '0'.repeat(6 - color.length) + color : 0;
-        }
-        let channel;
-        if (!dms) channel = msg.guild.channels.cache.get(id);
-        chanName = channel ? channel.name : 'deleted-channel';
+		if (name === id && !dms) {
+			let role = msg.guild.roles.cache.get(id);
+			name = role ? role.name : id;
+			color = role ? (role.color ? role.color.toString(16) : 0) : 0;
+			color = color ? `#${"0".repeat(6 - color.length)}${color}` : 0;
+		}
+		let channel;
+		if (!dms) channel = msg.guild.channels.cache.get(id);
+		chanName = channel ? channel.name : "deleted-channel";
 
-        let pingRegex = new RegExp(`(?:(<|>)?&lt;@!?(${id})&gt;)`, 'g');
-        let channelRegex = new RegExp(`&lt;#${id}&gt;`, 'g');
+		let pingRegex = new RegExp(`(?:(<|>)?&lt;@!?(${id})&gt;)`, "g");
+		let channelRegex = new RegExp(`&lt;#${id}&gt;`, "g");
 
-        textContent = textContent.replace(pingRegex, (a, b, c) =>
-            b == '<' || b == '>'
-                ? a
-                : `<span class="ping" ${id}" ${
-                      color ? `style="color: ${color}"` : ''
-                  }>${
-                      name.startsWith('!') ? `&lt;@${c}&gt;` : '@' + name
-                  }</span>`
-        );
-        if (!dms)
-            textContent = textContent.replace(
-                channelRegex,
-                chanName == 'deleted-channel'
-                    ? '#deleted-channel'
-                    : `<span class="ping ${id}">\#${chanName}</span>`
-            );
-    });
+		textContent = textContent.replace(pingRegex, (a, b, c) =>
+			b === "<" || b === ">"
+				? a
+				: `<span class="ping" ${id}" ${color ? `style="color: ${color}"` : ""}>${
+						name.startsWith("!") ? `&lt;@${c}&gt;` : `@${name}`
+				  }</span>`,
+		);
+		if (!dms) {
+			textContent = textContent.replace(
+				channelRegex,
+				chanName === "deleted-channel" ? "#deleted-channel" : `<span class="ping ${id}">\#${chanName}</span>`,
+			);
+		}
+	});
 
-    return textContent;
+	return textContent;
 }

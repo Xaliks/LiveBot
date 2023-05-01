@@ -5,7 +5,9 @@
     "main": "start.js",
     "scripts": {
         "test": "electron .",
-        "start": "electron ."
+        "start": "electron .",
+        "format": "eslint . --ext .js --fix",
+        "lint": "eslint . --ext .js"
     },
     "repository": {
         "type": "git",
@@ -27,6 +29,10 @@
         "electron": "^24.0.0"
     },
     "devDependencies": {
-        "electron-packager": "^13.1.1"
+        "electron-packager": "^17.1.1",
+        "eslint": "^8.39.0",
+        "eslint-plugin-n": "^15.7.0",
+        "eslint-plugin-prettier": "^4.2.1",
+        "prettier": "^2.8.8"
     }
 }

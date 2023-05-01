@@ -12,63 +12,61 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-'use strict';
+"use strict";
 
 // Set the activity
 function setActivity(dropdowns, activityName, streamurl) {
-    let status = dropdowns[0];
-    let activity = dropdowns[1];
+	let [status, activity] = dropdowns;
 
-    if (status.includes('Not')) {
-        status = 'dnd';
-    }
+	if (status.includes("Not")) {
+		status = "dnd";
+	}
 
-    if (activity == 'None')
-        bot.user.setPresence({
-            activities: [],
-            status: status.toLowerCase(),
-        });
-    else
-        bot.user.setPresence({
-            activities: [
-                {
-                    name: activityName,
-                    type: Discord.ActivityType[activity],
-                    url: streamurl || undefined,
-                },
-            ],
-            status: status.toLowerCase(),
-        });
+	if (activity === "None") {
+		bot.user.setPresence({
+			activities: [],
+			status: status.toLowerCase(),
+		});
+	} else {
+		bot.user.setPresence({
+			activities: [
+				{
+					name: activityName,
+					type: Discord.ActivityType[activity],
+					url: streamurl || undefined,
+				},
+			],
+			status: status.toLowerCase(),
+		});
+	}
 }
 
 // Set the new username
 async function setUsername(name) {
-    try {
-        if (!name.replace(/ |#/, '').length) {
-            errorHandler('EMPTY-NAME');
-            throw 'EMPTY-NAME';
-        }
-        await bot.user.setUsername(name).catch((err) => {
-            errorHandler(err);
-            throw err;
-        });
-        document.getElementById('userCardName').innerText = bot.user.username;
-    } catch (err) {
-        document
-            .getElementsByClassName('newNameInput')[0]
-            .animate(animations.flashRed, { duration: 500 });
-    }
+	try {
+		if (!name.replace(/ |#/, "").length) {
+			errorHandler("EMPTY-NAME");
+			throw "EMPTY-NAME";
+		}
+		await bot.user.setUsername(name).catch((err) => {
+			errorHandler(err);
+			throw err;
+		});
+		document.getElementById("userCardName").innerText = bot.user.username;
+	} catch (err) {
+		document.getElementsByClassName("newNameInput")[0].animate(animations.flashRed, { duration: 500 });
+	}
 }
 
 // Generate the invite code
 function generateInvite(items) {
-    let sum;
-    if (items.length) {
-        sum = items.reduce((a, b) => a + b);
-    } else {
-        sum = 0;
-    }
-    let invite = `https://discordapp.com/oauth2/authorize?client_id=${bot.user.id}&scope=bot&permissions=${sum}`;
-    console.log(`Copied to Clipboard: ${invite}`);
-    clipboard.writeText(invite);
+	let sum;
+	if (items.length) {
+		sum = items.reduce((a, b) => a + b);
+	} else {
+		sum = 0;
+	}
+	let invite = `https://discordapp.com/oauth2/authorize?client_id=${bot.user.id}&scope=bot&permissions=${sum}`;
+	console.log(`Copied to Clipboard: ${invite}`);
+	clipboard.writeText(invite);
 }
