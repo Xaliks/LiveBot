@@ -83,13 +83,8 @@ async function create() {
 	setLoadingPerc(0);
 	if (settings.defaultToken) {
 		let error = await load(settings.defaultToken);
-		if (error[0]) {
-			buildSplashToken();
-		}
-	} else {
-		buildSplashToken();
-		// errorHandler('NO-TOKEN');
-	}
+		if (error[0]) buildSplashToken();
+	} else buildSplashToken();
 }
 
 // Alert that you are typing
@@ -110,7 +105,9 @@ function options(type, content) {
 		case "invite":
 			selectedChan
 				.createInvite()
-				.then((invite) => command(`Created invite for ${invite.guild.name} \nhttps://discord.gg/${invite.code}`));
+				.then((invite) =>
+					command(`Created invite for ${invite.guild.name} \nhttps://discord.gg/${invite.code}`),
+				);
 			break;
 
 		default:

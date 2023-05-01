@@ -97,17 +97,12 @@ let embedTypes = {
 
 let showEmbed = (embed, element, msg) => {
 	let type = embed.type;
-	if (["rich", "link"].includes(type)) {
-		showRichEmbed(embed, msg, element, type);
-	} else if (["article"].includes(type)) {
-		showArticleEmbed(embed, msg, element);
-	} else if (["image"].includes(type)) {
-		showImageEmbed(embed, msg, element);
-	} else if (["gifv", "video"].includes(type)) {
-		showVideoEmbed(embed, msg, element);
-	} else {
-		showRichEmbed(embed, msg, element);
-	}
+
+	if (["rich", "link"].includes(type)) showRichEmbed(embed, msg, element, type);
+	else if (["article"].includes(type)) showArticleEmbed(embed, msg, element);
+	else if (["image"].includes(type)) showImageEmbed(embed, msg, element);
+	else if (["gifv", "video"].includes(type)) showVideoEmbed(embed, msg, element);
+	else showRichEmbed(embed, msg, element);
 };
 
 let showRichEmbed = (embed, msg, element, type) => {

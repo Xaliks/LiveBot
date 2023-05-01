@@ -105,9 +105,7 @@ function buildMemberMenu(parent) {
 	// Set the final position of the menu
 	let borderOffset = 40;
 	let y = window.pageYOffset + parent.getBoundingClientRect().top - 20;
-	if (y + div.clientHeight > window.innerHeight) {
-		y = window.innerHeight - div.clientHeight - borderOffset;
-	}
+	if (y + div.clientHeight > window.innerHeight) y = window.innerHeight - div.clientHeight - borderOffset;
 
 	div.style.top = `${y}px`;
 }

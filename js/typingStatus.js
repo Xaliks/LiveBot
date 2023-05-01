@@ -22,9 +22,8 @@ let typingTimer = {
 			typingStatus(false);
 		},
 		check(time, size) {
-			if (this.timer === null && size) {
-				this.timer = setInterval(this.func, time);
-			} else if (!size && this.timer !== null) {
+			if (this.timer === null && size) this.timer = setInterval(this.func, time);
+			else if (!size && this.timer !== null) {
 				clearInterval(this.timer);
 				this.timer = null;
 			}
@@ -73,11 +72,8 @@ function typingStatus(override = false, m = undefined) {
 
 	let length = users.length;
 
-	if (length) {
-		document.getElementById("typingDots").classList.add("enabled");
-	} else {
-		document.getElementById("typingDots").classList.remove("enabled");
-	}
+	if (length) document.getElementById("typingDots").classList.add("enabled");
+	else document.getElementById("typingDots").classList.remove("enabled");
 
 	for (let user in users) {
 		let name = dms ? users[user].username : users[user].displayName;
@@ -116,9 +112,7 @@ function typingStatus(override = false, m = undefined) {
 			if (lastTime < e.elapsedTime) {
 				shortestTime = e.elapsedTime;
 				let elapsedTime = new Date().getTime() - new Date(e.lastTimestamp).getTime();
-				if (shortestTime > shortestTime - elapsedTime) {
-					shortestTime = elapsedTime;
-				}
+				if (shortestTime > shortestTime - elapsedTime) shortestTime = elapsedTime;
 			}
 		});
 	}

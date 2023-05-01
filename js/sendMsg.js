@@ -89,9 +89,8 @@ let sendmsg = (text = "") => {
 					if (msg.length) {
 						let num = parseInt(args[0]);
 						if (Number.isNaN(num)) command("The value specified must be a number", 5000);
-						else if (num < 1) {
-							command("The number must be higher than 0", 5000);
-						} else {
+						else if (num < 1) command("The number must be higher than 0", 5000);
+						else {
 							(async () => {
 								let delet = async function (tries = 0, messages = 1) {
 									if (tries >= 5) return command("Exceeded the limit of 5 retries", 2000);
@@ -105,7 +104,7 @@ let sendmsg = (text = "") => {
 										command("Message failed to delete, trying again", 3000);
 										delet(++tries);
 									}
-									if (err && err.message === "You can only bulk delete messages that are under 14 days old.") {
+									if (err?.message === "You can only bulk delete messages that are under 14 days old.") {
 										command(
 											`Bypass ${
 												args[1] === "true"

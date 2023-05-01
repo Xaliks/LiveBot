@@ -124,9 +124,7 @@ function buildSplashToken() {
 		if (!error[0]) {
 			document.getElementById("selectMember").removeChild(container);
 			setLoadingPerc(0);
-		} else {
-			errorHandler(error[1]);
-		}
+		} else errorHandler(error[1]);
 	});
 	defaultButton.addEventListener("click", async () => {
 		let token = input.value;
@@ -134,8 +132,6 @@ function buildSplashToken() {
 		if (!error[0]) {
 			document.getElementById("selectMember").removeChild(container);
 			setLoadingPerc(0.05);
-		} else {
-			errorHandler(error[1]);
-		}
+		} else errorHandler(error[1]);
 	});
 }

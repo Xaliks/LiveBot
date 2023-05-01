@@ -25,9 +25,7 @@ async function addMemberList(guild) {
 	let members = guild.members.cache;
 	let roles = new Discord.Collection();
 
-	if (members.size !== guild.memberCount) {
-		members = await guild.members.fetch();
-	}
+	if (members.size !== guild.memberCount) members = await guild.members.fetch();
 
 	guild.roles.cache
 		.sort((role1, role2) => role2.rawPosition - role1.rawPosition)
@@ -45,18 +43,15 @@ async function addMemberList(guild) {
 			return 0;
 		})
 		.forEach((member) => {
-			if (!member.permissionsIn(selectedChan).has(Discord.PermissionFlagsBits.ViewChannel)) {
-				return;
-			}
+			if (!member.permissionsIn(selectedChan).has(Discord.PermissionFlagsBits.ViewChannel)) return;
 
 			let role;
 
 			if (!member.presence || member.presence.status === "offline") {
 				if (members.size < 1000) role = roles.get("offline");
 				else return;
-			} else if (member.roles.hoist) {
-				role = roles.get(member.roles.hoist.id);
-			} else if (member.presence.status !== "offline") role = roles.get("online");
+			} else if (member.roles.hoist) role = roles.get(member.roles.hoist.id);
+			else if (member.presence.status !== "offline") role = roles.get("online");
 
 			if (!role.container) {
 				role.container = document.createElement("div");

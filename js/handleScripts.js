@@ -61,7 +61,11 @@ let unloadAllScripts = () => {
 	// Stop and unload all the scripts
 	console.log("Stopping scripts...");
 	files.forEach((file) => {
-		if (file.endsWith(".js") && file !== "template.js" && require.cache[require.resolve(`./scripts/${file}`)]) {
+		if (
+			file.endsWith(".js") &&
+			file !== "template.js" &&
+			require.cache[require.resolve(`./scripts/${file}`)]
+		) {
 			try {
 				if (!require.cache[require.resolve(`./scripts/${file}`)].exports.stop) {
 					throw { message: ".exports.stop is not a function" };

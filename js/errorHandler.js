@@ -30,16 +30,17 @@ let animations = {
 function errorHandler(err) {
 	let code = err.code ? err.code : err;
 	if (err.name === "DiscordAPIError") discordApiErrors(code, err);
-	else if (code.includes("TOKEN")) {
-		customTokenErrors(code, err);
-	} else customErrors(code, err);
+	else if (code.includes("TOKEN")) customTokenErrors(code, err);
+	else customErrors(code, err);
 }
 
 // Discord api errors that aren't caught with discord.js
 function discordApiErrors(code, err) {
 	switch (err.message) {
 		case "Cannot send messages to this user":
-			console.error("This user either has direct messages disabled in the server or you've been blocked by the user");
+			console.error(
+				"This user either has direct messages disabled in the server or you've been blocked by the user",
+			);
 			command(
 				"I'm sorry but this user has you blocked or their direct messages are disabled!\n\nIf you wish to contact them through direct messages you'll have to ask them first.",
 			);
@@ -99,7 +100,9 @@ function customTokenErrors(code, err) {
 			break;
 		case "INVALID-TOKEN-FORMAT":
 			setLoadingPerc(-1, "The format of the token is invalid");
-			console.error(`The token format is invalid\n\nRandomly generated example of a token:\n${genFakeToken()}`);
+			console.error(
+				`The token format is invalid\n\nRandomly generated example of a token:\n${genFakeToken()}`,
+			);
 			break;
 		default:
 			setLoadingPerc(-1);

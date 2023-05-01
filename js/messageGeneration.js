@@ -108,10 +108,8 @@ function generateMsgHTML(message, previousMessage) {
 		text.classList.add("messageText");
 		text.innerHTML = parseMessage(message.cleanContent, message, false);
 
-		if (message.editedAt) {
-			// eslint-disable-next-line quotes
-			text.innerHTML += '<time class="edited"> (edited)</time>';
-		}
+		// eslint-disable-next-line quotes
+		if (message.editedAt) text.innerHTML += '<time class="edited"> (edited)</time>';
 
 		messageContainer.appendChild(text);
 	}

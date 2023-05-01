@@ -35,7 +35,9 @@ let parseSend = (text) => {
 	let customEmojiRegex = /^:([\d\w]+):|[^<]:([\d\w]+):/gm;
 	text = text.replaceAll("::", ": :").replaceAll(customEmojiRegex, (name) => {
 		console.log(name);
-		if (name[1] === ":") return name[0] + bot.emojis.cache.find((emoji) => emoji.name === name.slice(2, -1)).toString();
+		if (name[1] === ":") {
+			return name[0] + bot.emojis.cache.find((emoji) => emoji.name === name.slice(2, -1)).toString();
+		}
 		return bot.emojis.cache.find((emoji) => emoji.name === name.slice(1, -1)).toString();
 	});
 
@@ -96,9 +98,7 @@ function formatPings(msg, text, dms) {
 		} else if (type === "channel" && !dms) {
 			let channel = msg.guild.channels.cache.get(id);
 			name = channel ? channel.name : "deleted-channel";
-		} else {
-			name = id;
-		}
+		} else name = id;
 
 		name = name.replace(/(\[|\]|\(|\)|\\)/gm, (a) => `\\${a}`).replace(/\*/gm, "\\*");
 		let pingRegex = new RegExp(`(?:(<|>)?@!?(${name}))`, "g");
@@ -106,7 +106,10 @@ function formatPings(msg, text, dms) {
 		textContent = textContent.replace(pingRegex, (a, b, c) =>
 			b === "<" || b === ">"
 				? a
-				: `<span class="ping" ${id}" ${color ? `style="color: ${color}"` : ""}>@${c.replace(/\*/gm, "&#42")}</span>`,
+				: `<span class="ping" ${id}" ${color ? `style="color: ${color}"` : ""}>@${c.replace(
+						/\*/gm,
+						"&#42",
+				  )}</span>`,
 		);
 		if (!dms) {
 			textContent = textContent.replace(channelRegex, (a, b, c) =>
@@ -134,7 +137,9 @@ function formatEmbedPings(msg, text, dms) {
 		let chanName = "";
 		let color = 0;
 
-		let user = dms ? bot.users.cache.get(id.replace(/!/, "")) : msg.guild.members.cache.get(id.replace(/!/, ""));
+		let user = dms
+			? bot.users.cache.get(id.replace(/!/, ""))
+			: msg.guild.members.cache.get(id.replace(/!/, ""));
 		name = user?.displayName || user?.username || id;
 
 		if (name === id && !dms) {

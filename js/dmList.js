@@ -21,11 +21,8 @@ function mutualGuilds(u, g, remove) {
 		bot.guilds.cache.each((g) => {
 			if (!g.available) return;
 			let inGuild = g.members.cache.get(u.id);
-			if (inGuild && !u.mutualGuilds.get(u.id)) {
-				u.mutualGuilds.set(g.id, g);
-			} else if (!inGuild && u.mutualGuilds.get(u.id)) {
-				u.mutualGuilds.delete(g.id);
-			}
+			if (inGuild && !u.mutualGuilds.get(u.id)) u.mutualGuilds.set(g.id, g);
+			else if (!inGuild && u.mutualGuilds.get(u.id)) u.mutualGuilds.delete(g.id);
 		});
 		return;
 	}
@@ -66,9 +63,10 @@ function dmList() {
 		// Clear guild card
 		let children = document.getElementById("serverName").children;
 		children[0].innerText = "Direct Messages"; // Server name element
-		if (!Array.from(children[0].classList).includes("directMsg")) {
-			children[0].classList.add("directMsg"); // Toggle on the directMsg class for css
-		}
+
+		// Toggle on the directMsg class for css
+		if (!Array.from(children[0].classList).includes("directMsg")) children[0].classList.add("directMsg");
+
 		children[1].src = "resources/icons/logo.svg"; // Server icon element
 		children[2].style.display = "none"; // Member text element
 		children[3].innerText = ""; // Member count element
@@ -199,10 +197,6 @@ function dmList() {
 
 			// Check in which category the user should go in
 			if (u.openDM) open[0].getElementsByTagName("div")[1].appendChild(div);
-			else if (!u.openDM && u.received) {
-				received[0].getElementsByTagName("div")[1].appendChild(div);
-			} else {
-				// other[0].getElementsByTagName('div')[1].appendChild(div);
-			}
+			else if (u.received) received[0].getElementsByTagName("div")[1].appendChild(div);
 		});
 }

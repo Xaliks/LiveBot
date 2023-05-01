@@ -67,9 +67,7 @@ function editMsg(target) {
 			if (textarea.value === text) return editDOM(target, textarea, text);
 			let newText = textarea.value;
 			newText = newText.replace(/(<a?:)(!)?(.+?:[0-9]+?>)/gm, (a, b, c, d) => {
-				if (c !== "!") {
-					return `${b}!${d}`;
-				}
+				if (c !== "!") return `${b}!${d}`;
 				return a;
 			});
 

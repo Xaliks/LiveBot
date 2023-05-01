@@ -19,10 +19,8 @@
 function addDocListener() {
 	document.addEventListener("keydown", (e) => {
 		// When ESC is pressed
-		if (e.key === 27) {
-			// Safe check so there is only one DOM to edit messages
-			checkEditDoms();
-		}
+		// Safe check so there is only one DOM to edit messages
+		if (e.key === 27) checkEditDoms();
 	});
 
 	document.addEventListener("mousedown", async (e) => {
@@ -56,14 +54,10 @@ function addDocListener() {
 			if (target === document.body) return;
 
 			// If the element clicked is a member on the member list, build the member menu
-			if (target.classList.contains(domElements[0])) {
-				buildMemberMenu(target);
-			}
+			if (target.classList.contains(domElements[0])) buildMemberMenu(target);
 
 			// This is not in the domElements, because it has no child elements to check for
-			if (target.id === "embedBuilderIcon") {
-				buildEmbedMenu();
-			}
+			if (target.id === "embedBuilderIcon") buildEmbedMenu();
 
 			// If the element clicked is not the embed builder menu, delete the embed builder menu
 		} else if (e.button === 2) {
@@ -86,10 +80,9 @@ function addDocListener() {
 			// Variable to keep track of if the menu should be opened
 			let open;
 			// Check what the menu is for and then build the menu so we can use the height
-			if (target.classList.contains(domElements[0])) {
-				open = await buildMsgMenu(target, rcMenu);
-			} else if (domElements.splice(1).some((r) => target.classList.contains(r))) {
-				open = await buildUserMenu(target, rcMenu);
+			if (target.classList.contains(domElements[0])) open = await buildMsgMenu(target, rcMenu);
+			else if (domElements.splice(1).some((r) => target.classList.contains(r))) {
+				open = buildUserMenu(target, rcMenu);
 			}
 
 			// Check if it should be opened and if it shouldn't close it just in case
@@ -105,9 +98,7 @@ function addDocListener() {
 			if (y + rcMenu.clientHeight > window.innerHeight) {
 				y = window.innerHeight - rcMenu.clientHeight - menuOffset;
 			}
-			if (x + rcMenu.clientWidth > window.innerWidth) {
-				x = x - rcMenu.clientWidth;
-			}
+			if (x + rcMenu.clientWidth > window.innerWidth) x = x - rcMenu.clientWidth;
 
 			rcMenu.style.left = `${x}px`;
 			rcMenu.style.top = `${y}px`;
@@ -124,14 +115,9 @@ function newOption(label, func, red = false, greyed, ...args) {
 	if (red) item.classList.add("red");
 
 	// Check if the option is available
-	if (greyed) {
-		item.classList.add("greyed");
-	} else {
-		// Add the event listener to func
-		item.addEventListener("mousedown", () => {
-			func(...args);
-		});
-	}
+	if (greyed) item.classList.add("greyed");
+	// Add the event listener to func
+	else item.addEventListener("mousedown", () => func(...args));
 
 	// Create the text
 	let text = document.createElement("span");

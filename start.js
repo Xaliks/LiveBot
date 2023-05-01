@@ -42,11 +42,8 @@ function createWindow() {
 				win.minimize();
 				break;
 			case "screenSnap":
-				if (!win.isMaximized()) {
-					win.maximize();
-				} else {
-					win.unmaximize();
-				}
+				if (!win.isMaximized()) win.maximize();
+				else win.unmaximize();
 				break;
 			case "exit":
 				win.close();
@@ -82,15 +79,11 @@ function createWindow() {
 app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {
-	if (process.platform !== "darwin") {
-		app.quit();
-	}
+	if (process.platform !== "darwin") app.quit();
 });
 
 app.on("activate", () => {
-	if (win === null) {
-		createWindow();
-	}
+	if (win === null) createWindow();
 });
 
 app.on("web-contents-created", (e, contents) => {

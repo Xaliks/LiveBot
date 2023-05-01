@@ -75,7 +75,8 @@ function createChannels(g) {
 	g.channels.cache
 		.filter((c) => !Discord.Constants.ThreadChannelTypes.includes(c.type)) // Threads are currently not supported
 		.map((c) => {
-			c.rawPosition = c.type === Discord.ChannelType.GuildVoice ? c.rawPosition + g.channels.cache.size : c.rawPosition;
+			c.rawPosition =
+				c.type === Discord.ChannelType.GuildVoice ? c.rawPosition + g.channels.cache.size : c.rawPosition;
 			return c;
 		}) // Put voice channels after text channels
 		.filter((c) => c.type !== Discord.ChannelType.GuildCategory)

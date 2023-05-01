@@ -33,18 +33,14 @@ async function setToken(token) {
 	});
 
 	let error = [false, "none"];
-	if (global.bot && bot.token === token) {
-		return [true, "SAME-TOKEN"];
-	}
+	if (global.bot && bot.token === token) return [true, "SAME-TOKEN"];
+
 	try {
 		setLoadingPerc(0.05);
 		error = await validateToken(token);
-		if (error[0]) {
-			throw error[1];
-		}
-		await client.login(token).catch((err) => {
-			throw err;
-		});
+		if (error[0]) throw error[1];
+
+		await client.login(token);
 		client.destroy();
 
 		setLoadingPerc(0.1); // Refreshing the everything
@@ -53,9 +49,7 @@ async function setToken(token) {
 
 		// Delete the list of the guilds
 		let guildContainer = document.getElementById("guildContainer");
-		if (guildContainer && guildContainer.parentElement) {
-			guildContainer.parentElement.removeChild(guildContainer);
-		}
+		if (guildContainer?.parentElement) guildContainer.parentElement.removeChild(guildContainer);
 
 		// Clear the message list
 		document.getElementById("message-list").replaceChildren();
@@ -65,9 +59,8 @@ async function setToken(token) {
 		memberList.innerHTML = "";
 
 		// Stop the current bot, unload scripts, and then load into the new token
-		if (global.bot !== undefined) {
-			bot.destroy();
-		}
+		if (global.bot !== undefined) bot.destroy();
+
 		await unloadAllScripts();
 		await unloadThemes();
 		load(token);

@@ -18,10 +18,7 @@ let channelSelect = (c, name) => {
 	let messages = document.getElementById("message-list");
 	let fetchSize = 100;
 
-	if (!Discord.Constants.TextBasedChannelTypes.includes(c.type)) {
-		selectedVoice = c;
-		return;
-	}
+	if (!Discord.Constants.TextBasedChannelTypes.includes(c.type)) return (selectedVoice = c);
 
 	selectedChan = c;
 
@@ -35,15 +32,11 @@ let channelSelect = (c, name) => {
 		// Set color of the channel
 		selectedChanDiv.style.color = "#606266";
 		name.addEventListener("mouseover", () => {
-			if (name.style.color !== "rgb(238, 238, 238)") {
-				name.style.color = "#B4B8BC";
-			}
+			if (name.style.color !== "rgb(238, 238, 238)") name.style.color = "#B4B8BC";
 		});
 
 		name.addEventListener("mouseleave", () => {
-			if (name.style.color !== "rgb(238, 238, 238)") {
-				name.style.color = "#606266";
-			}
+			if (name.style.color !== "rgb(238, 238, 238)") name.style.color = "#606266";
 		});
 	}
 

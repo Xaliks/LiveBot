@@ -26,17 +26,13 @@ async function addGuilds() {
 		.filter((g) => (bot.hideUnallowed ? g.members.cache.get(bot.owner.id) : g))
 		.forEach(async (g) => {
 			// Check if the guild is available first, if it's not then remove it
-			if (!g.available) {
-				await g.fetch();
-			}
-			if (!g.available) {
-				errorHandler("SERVER_OFFLINE");
-			}
+			if (!g.available) await g.fetch();
+			if (!g.available) errorHandler("SERVER_OFFLINE");
 			let img;
 			// console.log(g.name);
 
 			// If there is no icon url for the server, create the letter icon
-			if (g.iconURL() === null) {
+			if (!g.iconURL()) {
 				img = document.createElement("div");
 
 				img.style.backgroundColor = "#2F3136";
@@ -49,19 +45,14 @@ async function addGuilds() {
 			} else {
 				// The guild has an icon, create the image
 				img = document.createElement("img");
+				img.src = g.iconURL({ size: 64, forceStatic: true });
 
-				let ico = `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.webp?size=64`;
-
-				// Check if the icon is animated and add the animation on hover or remove it
-				if (g.icon.startsWith("a_")) {
-					img.onmouseenter = () => {
-						img.src = ico.replace(".webp", ".gif");
-					};
-					img.onmouseleave = () => {
-						img.src = ico;
-					};
-				}
-				img.src = ico;
+				img.onmouseenter = () => {
+					img.src = g.iconURL({ size: 64 });
+				};
+				img.onmouseleave = () => {
+					img.src = g.iconURL({ size: 64, forceStatic: true });
+				};
 
 				img.alt = g.name;
 				img.height = "40";
@@ -102,7 +93,10 @@ async function addGuilds() {
 			guildIcon.appendChild(guildNameContainer);
 
 			// Add image to the list of guilds
-			if (lastGuild === null || (lastGuild.parentElement && lastGuild.parentElement.lastElementChild === lastGuild)) {
+			if (
+				lastGuild === null ||
+				(lastGuild.parentElement && lastGuild.parentElement.lastElementChild === lastGuild)
+			) {
 				// Append the guild to the last spot
 				document.getElementById("guildContainer").appendChild(guildIcon);
 				cachedGuilds.push([g.id, guildIcon]);
@@ -128,15 +122,11 @@ async function addGuilds() {
 
 			// Load the guild while starting up if it was the last guild stored
 			// Doing it at the end so the indicator doesn't end up on the top
-			if (g.id === settings.lastGuild) {
-				guildSelect(g, img);
-			}
+			if (g.id === settings.lastGuild) guildSelect(g, img);
 		});
 
 	// Done loading.
-	if (settings.options.splash) {
-		setLoadingPerc(1);
-	}
+	if (settings.options.splash) setLoadingPerc(1);
 }
 
 // Remove the guild

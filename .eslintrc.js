@@ -103,7 +103,7 @@ module.exports = {
 				semi: true,
 				trailingComma: "all",
 				singleQuote: false,
-				printWidth: 123,
+				printWidth: 110,
 				tabWidth: 2,
 			},
 		],

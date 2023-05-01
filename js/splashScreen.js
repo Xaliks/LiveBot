@@ -46,7 +46,5 @@ async function showSplashScreen(token = undefined, save = false) {
 	if (!error[0]) {
 		settings.options.splash = true;
 		document.getElementById("splashScreen").style.visibility = "visible";
-	} else {
-		errorHandler(error[1]);
-	}
+	} else errorHandler(error[1]);
 }

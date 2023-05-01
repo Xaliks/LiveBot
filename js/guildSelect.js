@@ -40,10 +40,8 @@ let guildSelect = (g, img) => {
 	document.getElementById("guildName").innerText = name;
 
 	// Update guild profile image
-	let icon = g.iconURL();
-	if (!icon) {
-		icon = "resources/images/default.png";
-	}
+	let icon = g.iconURL({ size: 64 });
+	if (!icon) icon = "resources/images/default.png";
 	document.getElementById("guildImg").src = icon;
 
 	// Clear the message list

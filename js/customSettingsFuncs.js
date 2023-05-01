@@ -18,9 +18,7 @@
 function setActivity(dropdowns, activityName, streamurl) {
 	let [status, activity] = dropdowns;
 
-	if (status.includes("Not")) {
-		status = "dnd";
-	}
+	if (status.includes("Not")) status = "dnd";
 
 	if (activity === "None") {
 		bot.user.setPresence({
@@ -60,13 +58,9 @@ async function setUsername(name) {
 
 // Generate the invite code
 function generateInvite(items) {
-	let sum;
-	if (items.length) {
-		sum = items.reduce((a, b) => a + b);
-	} else {
-		sum = 0;
-	}
-	let invite = `https://discordapp.com/oauth2/authorize?client_id=${bot.user.id}&scope=bot&permissions=${sum}`;
-	console.log(`Copied to Clipboard: ${invite}`);
-	clipboard.writeText(invite);
+	clipboard.writeText(
+		`https://discordapp.com/oauth2/authorize?client_id=${bot.user.id}&scope=bot&permissions=${
+			items.reduce((a, b) => a + b) || 0
+		}`,
+	);
 }

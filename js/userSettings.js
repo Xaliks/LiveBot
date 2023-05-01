@@ -73,9 +73,7 @@ let settings = {
 		if (settings.defaultToken === null) settings.defaultToken = "";
 		if (typeof settings.tokens !== "array") settings.tokens = [];
 
-		if (this.token !== "" && !settings.tokens.includes(this.token)) {
-			settings.tokens.push(this.token);
-		}
+		if (this.token !== "" && !settings.tokens.includes(this.token)) settings.tokens.push(this.token);
 
 		if (settings.tokenSettings === null) settings.tokenSettings = {};
 		Object.keys(settings.tokenSettings).forEach((token) =>
@@ -161,12 +159,8 @@ let settings = {
 					return settings;
 				} else if (["object", "array"].includes(typeof settings)) {
 					let ret = recursive(settingsO, p.length ? `${p}|${setting}` : setting);
-					if (ret) {
-						return [ret, settingsO];
-					}
-				} else {
-					continue;
-				}
+					if (ret) return [ret, settingsO];
+				} else continue;
 			}
 		};
 		let ret = recursive(this.settings, path);
@@ -203,9 +197,7 @@ let settings = {
 			}
 		},
 		closeSettings: (groupName) => {
-			if (settings.options.settingsOpened) {
-				toggleSettings();
-			}
+			if (settings.options.settingsOpened) toggleSettings();
 		},
 		closePopups: () => {
 			// Remove all popups
@@ -219,19 +211,16 @@ let settings = {
 };
 
 let toggleSettings = () => {
-	if (settings.options.settingsOpened) {
-		settings.functions.closePopups();
-	}
+	if (settings.options.settingsOpened) settings.functions.closePopups();
+
 	let userCard = document.getElementById("userSettings");
-	if (userCard.classList.length) {
-		userCard.classList.toggle("userSettingsToggleOff");
-	}
+	if (userCard.classList.length) userCard.classList.toggle("userSettingsToggleOff");
+
 	userCard.classList.toggle("userSettingsToggle");
 
 	let userPullOutIcon = document.getElementById("userPullOutIcon");
-	if (userPullOutIcon.classList.length) {
-		userPullOutIcon.classList.toggle("userSettingsFlipOff");
-	}
+	if (userPullOutIcon.classList.length) userPullOutIcon.classList.toggle("userSettingsFlipOff");
+
 	userPullOutIcon.classList.toggle("userSettingsFlip");
 	settings.options.settingsOpened = !settings.options.settingsOpened;
 };
@@ -246,9 +235,8 @@ function openPopup(category, group) {
 	});
 
 	category.classList.toggle("toggledOn");
-	if (category.classList.contains("toggledOn")) {
-		createPopup(category.parentElement, group);
-	} else {
+	if (category.classList.contains("toggledOn")) createPopup(category.parentElement, group);
+	else {
 		let settingsPopup = category.parentElement.querySelector(".settingsPopup");
 		if (settingsPopup) settingsPopup.remove();
 	}
@@ -328,15 +316,12 @@ function createPopup(parent, jsonObj) {
 		group.options.forEach((option) => {
 			let params = [optionContainer];
 
-			if (option.type === "dropdown") {
-				params = params.concat([option.options], option.default, group, option);
-			} else if (option.type === "shortinput") {
+			if (option.type === "dropdown") params = params.concat([option.options], option.default, group, option);
+			else if (option.type === "shortinput") {
 				params = params.concat(false, option.placeholder, option.class, option.id);
-			} else if (option.type === "checkbox") {
-				params = params.concat(option);
-			} else if (option.type === "separator") {
-				params = params.concat(option.label);
-			}
+			} else if (option.type === "checkbox") params = params.concat(option);
+			else if (option.type === "separator") params = params.concat(option.label);
+
 			addItem(option.type, ...params);
 		});
 
@@ -350,7 +335,9 @@ function createPopup(parent, jsonObj) {
 
 				let activityInput = "''";
 				if (btn.parentElement.querySelector(".activityInput")) {
-					activityInput = `'${btn.parentElement.querySelector(".activityInput").value.replace(/\\*'/g, "\\'")}'`;
+					activityInput = `'${btn.parentElement
+						.querySelector(".activityInput")
+						.value.replace(/\\*'/g, "\\'")}'`;
 				} else activityInput = "''";
 
 				let streamURL = "''";
@@ -365,7 +352,9 @@ function createPopup(parent, jsonObj) {
 
 				let codes = [];
 				if (btn.parentElement.querySelector(".checkbox")) {
-					codes = Array.from(btn.parentElement.querySelectorAll(".checkbox.toggled")).map((e) => parseInt(e.id, 16));
+					codes = Array.from(btn.parentElement.querySelectorAll(".checkbox.toggled")).map((e) =>
+						parseInt(e.id, 16),
+					);
 				}
 
 				let token = "''";
@@ -401,15 +390,10 @@ function createPopup(parent, jsonObj) {
 
 // Check which option should be added, add it
 function addItem(method, ...args) {
-	if (method === "dropdown") {
-		genDropDown(...args);
-	} else if (method === "shortinput") {
-		genShortInput(...args);
-	} else if (method === "checkbox") {
-		genCheckbox(...args);
-	} else if (method === "separator") {
-		genSeparator(...args);
-	}
+	if (method === "dropdown") genDropDown(...args);
+	else if (method === "shortinput") genShortInput(...args);
+	else if (method === "checkbox") genCheckbox(...args);
+	else if (method === "separator") genSeparator(...args);
 }
 
 // Toggling the special boxes
@@ -490,9 +474,7 @@ function genShortInput(parent, special = false, placeholder, customClass, id = u
 	if (special) {
 		input.classList.add("special");
 		parent.insertAdjacentElement("afterend", input);
-	} else {
-		parent.appendChild(input);
-	}
+	} else parent.appendChild(input);
 
 	// Create the token event listeners
 	if (id === "tokenbox") {
@@ -600,9 +582,7 @@ function genDropDown(parent, options, defaultOpt = 0, group, optionObj) {
 								target.querySelector(".dropdownChildren").firstElementChild.click();
 								target.click();
 							}
-						} else {
-							child.classList.remove("disabled");
-						}
+						} else child.classList.remove("disabled");
 						child = child.nextElementSibling;
 					}
 				} else {
@@ -615,9 +595,7 @@ function genDropDown(parent, options, defaultOpt = 0, group, optionObj) {
 		});
 		option.innerText = title;
 
-		if (title === defaultOption) {
-			option.classList.add("selectedOption");
-		}
+		if (title === defaultOption) option.classList.add("selectedOption");
 
 		childContainer.appendChild(option);
 	});

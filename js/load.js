@@ -42,9 +42,7 @@ let load = async (token) => {
 
 	let error = [false, "none"];
 	error = validateToken(token);
-	if (error[0]) {
-		return error;
-	}
+	if (error[0]) return error;
 
 	// hideSplashScreen(); // TESTING - DO NOT COMMIT
 	await bot
@@ -55,9 +53,7 @@ let load = async (token) => {
 		.then(() => {
 			setLoadingPerc(0.15);
 		});
-	if (error[0]) {
-		return error;
-	}
+	if (error[0]) return error;
 
 	bot.on("ready", async () => {
 		// Reset the timer on the presence thing (heartbeat)
@@ -122,9 +118,7 @@ let load = async (token) => {
 			if (id) {
 				bot.owner = botOwner.members.find((x) => x.user.id === id).user;
 				continueLoad();
-			} else {
-				buildTeamMemberCards(continueLoad);
-			}
+			} else buildTeamMemberCards(continueLoad);
 		} else {
 			bot.owner = botOwner;
 			continueLoad();
@@ -151,12 +145,8 @@ let load = async (token) => {
 	bot.on("typingStart", (typing) => {
 		// reverts https://github.com/discordjs/discord.js/pull/6114/files
 		// Caching a typing status
-		if (!typing.channel._typing) {
-			typing.channel._typing = new Discord.Collection();
-		}
-		if (!typing.user._typing) {
-			typing.user._typing = new Discord.Collection();
-		}
+		if (!typing.channel._typing) typing.channel._typing = new Discord.Collection();
+		if (!typing.user._typing) typing.user._typing = new Discord.Collection();
 
 		if (typing.channel._typing.has(typing.user.id)) {
 			const userTyping = typing.channel._typing.get(typing.user.id);
@@ -267,10 +257,7 @@ let load = async (token) => {
 				scroll = true;
 			}
 
-			if (barry) {
-				// bunch = false;
-				barry = false;
-			}
+			if (barry) barry = false;
 
 			// Generate and add the message
 			let message = generateMsgHTML(m, previousMessage);
@@ -283,7 +270,8 @@ let load = async (token) => {
 			// console.log("Message list scrolled: " + document.getElementById('message-list').scrollHeight);
 			// console.log("Total Height: " + (document.getElementById('message-list').scrollHeight - Math.floor(document.getElementById('message-list').scrollTop)));
 			if (scroll === true) {
-				document.getElementById("message-list").scrollTop = document.getElementById("message-list").scrollHeight;
+				document.getElementById("message-list").scrollTop =
+					document.getElementById("message-list").scrollHeight;
 				scroll = false;
 			}
 		}
@@ -336,12 +324,8 @@ function removeMessage(message, firstMessage) {
 
 				message.parentElement.removeChild(nextElement);
 			} else message.parentElement.parentElement.removeChild(message.parentElement);
-		} else {
-			message.parentElement.removeChild(message);
-		}
-	} else {
-		document.getElementById("message-list").removeChild(message.parentNode);
-	}
+		} else message.parentElement.removeChild(message);
+	} else document.getElementById("message-list").removeChild(message.parentNode);
 }
 
 function setLoadingPerc(num, text = "") {
