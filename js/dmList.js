@@ -81,20 +81,13 @@ function dmList() {
 	if (!bot.users.cache.size) return;
 
 	// Clear all the channels to make space for the users
-	let channelList = document.getElementById("channel-elements");
-	while (channelList.firstChild) {
-		channelList.removeChild(channelList.firstChild);
-	}
+	document.getElementById("channel-elements").replaceChildren();
 
 	// Clear the member bar so it can be filled with something else
-	let memberList = document.getElementById("memberBar");
-	memberList.innerHTML = "";
+	document.getElementById("memberBar").replaceChildren();
 
 	// Clear the message list
-	let messages = document.getElementById("message-list");
-	while (messages.firstChild) {
-		messages.removeChild(messages.firstChild);
-	}
+	document.getElementById("message-list").replaceChildren();
 
 	// Categories that are going to be used to sort the users
 	let categories = [

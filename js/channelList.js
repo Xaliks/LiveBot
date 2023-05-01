@@ -15,11 +15,10 @@
 "use strict";
 
 function createChannels(g) {
+	const channelList = document.getElementById("channel-elements");
+
 	// Clear the channels list
-	let channelList = document.getElementById("channel-elements");
-	while (channelList.firstChild) {
-		channelList.removeChild(channelList.firstChild);
-	}
+	channelList.replaceChildren();
 
 	// The parent variable will change, realParent will not
 	const realParent = document.getElementById("channel-elements");

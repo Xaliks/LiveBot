@@ -153,20 +153,13 @@ function removeGuild(g) {
 		selectedGuild = undefined;
 
 		// Clear the list of channels
-		let channels = document.getElementById("channel-elements");
-		while (channels.firstChild) {
-			channels.removeChild(channels.firstChild);
-		}
+		document.getElementById("channel-elements").replaceChildren();
 
 		// Clear the message list
-		let messages = document.getElementById("message-list");
-		while (messages.firstChild) {
-			messages.removeChild(messages.firstChild);
-		}
+		document.getElementById("message-list").replaceChildren();
 
 		// Clear the member list
-		let memberList = document.getElementById("memberBar");
-		memberList.innerHTML = "";
+		document.getElementById("memberBar").replaceChildren();
 	}
 	// If the channel is deleted then remove it from the variable
 	if (

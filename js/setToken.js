@@ -49,10 +49,7 @@ async function setToken(token) {
 
 		setLoadingPerc(0.1); // Refreshing the everything
 		// Clear the list of channels
-		let channels = document.getElementById("channel-elements");
-		while (channels.firstChild) {
-			channels.removeChild(channels.firstChild);
-		}
+		document.getElementById("channel-elements").replaceChildren();
 
 		// Delete the list of the guilds
 		let guildContainer = document.getElementById("guildContainer");
@@ -61,10 +58,7 @@ async function setToken(token) {
 		}
 
 		// Clear the message list
-		let messages = document.getElementById("message-list");
-		while (messages.firstChild) {
-			messages.removeChild(messages.firstChild);
-		}
+		document.getElementById("message-list").replaceChildren();
 
 		// Clear the member list
 		let memberList = document.getElementById("memberBar");

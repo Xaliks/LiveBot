@@ -47,10 +47,7 @@ let guildSelect = (g, img) => {
 	document.getElementById("guildImg").src = icon;
 
 	// Clear the message list
-	let messages = document.getElementById("message-list");
-	while (messages.firstChild) {
-		messages.removeChild(messages.firstChild);
-	}
+	document.getElementById("message-list").replaceChildren();
 
 	// Create the channels
 	createChannels(g);

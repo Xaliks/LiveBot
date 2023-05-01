@@ -310,9 +310,7 @@ let load = async (token) => {
 	// Runs when unloaded
 	bot.on("error", () => {
 		// Remove the server list when connection lost
-		while (document.getElementById("guild-list").firstChild) {
-			document.getElementById("guild-list").removeChild(document.getElementById("guild-list").firstChild);
-		}
+		document.getElementById("guild-list").replaceChildren();
 		// Unload and stop all the scripts
 		unloadAllScripts();
 		// Unload all the themes
