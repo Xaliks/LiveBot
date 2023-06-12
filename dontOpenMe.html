@@ -24,11 +24,8 @@ limitations under the License. -->
                     "This isn't going to work. Please follow the instructions on LiveBot's github page in the readme.md file. This app is based on NodeJS and it's modules and is not made to work in a browser."
                 );
             }
-
-            // "Fixes" a deprecation in the electron source code
-            // https://developer.chrome.com/blog/enabling-shared-array-buffer/
-            if (!crossOriginIsolated) SharedArrayBuffer = ArrayBuffer;
         </script>
+        <script src="js/libs/twemoji-14.1.2.js" charset="utf-8"></script>
         <script src="js/app.js" charset="utf-8"></script>
         <script src="js/load.js" charset="utf-8"></script>
         <script src="js/guildList.js" charset="utf-8"></script>
@@ -47,7 +44,6 @@ limitations under the License. -->
         <script src="js/showEmbed.js" charset="utf-8"></script>
         <script src="js/addMemberList.js" charset="utf-8"></script>
         <script src="js/messageGeneration.js" charset="utf-8"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@twemoji/api/dist/twemoji.js"></script>
         <script src="js/converter.js" charset="utf-8"></script>
         <script src="js/typingStatus.js" charset="utf-8"></script>
         <script src="js/rcMenuFuncs.js" charset="utf-8"></script>
@@ -221,8 +217,8 @@ limitations under the License. -->
                 <p id="members-count" class="members">Infinite</p>
             </div>
 
-            <div id="channel-list">
-                <div id="channel-elements"></div>
+            <div class="channel-list">
+                <ul id="channel-elements"></ul>
             </div>
 
             <!-- Pull up menu for settings -->

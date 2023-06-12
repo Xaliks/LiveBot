@@ -14,158 +14,231 @@
 
 "use strict";
 
-function createChannels(g) {
+function createChannels(guild) {
 	const channelList = document.getElementById("channel-elements");
 
 	// Clear the channels list
 	channelList.replaceChildren();
 
-	// The parent variable will change, realParent will not
-	const realParent = document.getElementById("channel-elements");
-	let parent = realParent;
-	let categoryParent;
+	const currentSelectedChannelId = settings.lastChannels[guild.id];
 
-	// Sort the channels and add them to the screen
-	g.channels.cache
-		.filter((c) => c.type === Discord.ChannelType.GuildCategory)
-		.sort((c1, c2) => c1.rawPosition - c2.rawPosition)
-		.each((c) => {
-			let category = document.createElement("div");
-			category.classList.add("category");
-			category.classList.add("open");
-			category.id = c.id;
-			realParent.appendChild(category);
+	const categories = new Discord.Collection();
+	categories.set("noCategory", { id: "noCategory", channels: [] });
 
-			// Container for the category svg and name
-			let nameCategory = document.createElement("div");
-			nameCategory.classList.add("categoryNameContainer");
-			category.appendChild(nameCategory);
+	guild.channels.cache
+		// Threads are currently not supported
+		.filter((channel) => !Discord.Constants.ThreadChannelTypes.includes(channel.type))
+		// Filter categories
+		.filter((channel) => channel.type !== Discord.ChannelType.GuildCategory)
+		// Put voice channels after text channels
+		.map((channel) => {
+			if (Discord.Constants.VoiceBasedChannelTypes.includes(channel.type)) {
+				channel.rawPosition += guild.channels.cache.size;
+			}
+			return channel;
+		})
+		// Sort channels by position
+		.sort((channel1, channel2) => channel1.rawPosition - channel2.rawPosition)
+		.forEach((channel) => {
+			const category = categories.get(channel.parentId || "noCategory") || {
+				id: channel.parentId || "noCategory",
+				name: channel.parent?.name,
+				channels: [],
+			};
 
-			// Create the svg icon
-			let svg = document.createElement("img");
-			// svg.type = "image/svg+xml";
-			// svg.data
-			svg.src = "./resources/icons/categoryArrow.svg";
-			svg.classList.add("categorySVG");
-			nameCategory.appendChild(svg);
-
-			// Create the category name
-			let text = document.createElement("h5");
-			text.classList.add("categoryText");
-			text.innerText = c.name;
-			nameCategory.appendChild(text);
-
-			// Create the container for all the channels
-			let div = document.createElement("div");
-			div.classList.add("channelContainer");
-			category.appendChild(div);
-
-			// Event listener for opening and closing
-			nameCategory.addEventListener("click", (event) => {
-				category.classList.toggle("open");
-			});
-
-			// Set the parent for the next added channels
-			parent = div;
-			categoryParent = c;
+			category.channels.push(channel);
+			categories.set(category.id, category);
 		});
 
-	let openedDefaultChannel = false;
-	let defaultDiv;
-	g.channels.cache
-		.filter((c) => !Discord.Constants.ThreadChannelTypes.includes(c.type)) // Threads are currently not supported
-		.map((c) => {
-			c.rawPosition =
-				c.type === Discord.ChannelType.GuildVoice ? c.rawPosition + g.channels.cache.size : c.rawPosition;
-			return c;
-		}) // Put voice channels after text channels
-		.filter((c) => c.type !== Discord.ChannelType.GuildCategory)
-		.sort((c1, c2) => c1.rawPosition - c2.rawPosition)
-		.forEach((c) => {
-			// At this point, the channel is either text or voice
-			let div = document.createElement("div");
-			div.classList.add("channel");
-			// div.classList.add(Discord.ChannelType[c.type]);
-			div.id = c.id;
+	categories.forEach((category) => {
+		if (!category.channels.length) return;
 
-			// check if user can access the channel
-			let blocked = false;
+		const categoryContainer = document.createElement("li");
+		channelList.appendChild(categoryContainer);
+		categoryContainer.classList.add("categoryContainer");
+
+		// If channels has category
+		if (category.id !== "noCategory") {
+			categoryContainer.id = category.id;
+
+			const categoryWrapper = document.createElement("div");
+			categoryContainer.appendChild(categoryWrapper);
+			categoryWrapper.classList.add("categoryWrapper");
+
+			const categoryContent = document.createElement("div");
+			categoryWrapper.appendChild(categoryContent);
+			categoryContent.classList.add("categoryContent");
+
+			// Create the category arrow
+			const categoryArrowElement = new DOMParser().parseFromString(
+				fs.readFileSync("./resources/icons/channels/categoryArrow.svg", "utf8"),
+				"text/html",
+			).body.firstElementChild;
+			categoryContent.appendChild(categoryArrowElement);
+			categoryArrowElement.classList.add("categoryArrow");
+
+			// Create the category name
+			const categoryNameElement = document.createElement("div");
+			categoryContent.appendChild(categoryNameElement);
+			categoryNameElement.classList.add("categoryName");
+			categoryNameElement.innerText = category.name;
+
+			// Event listener for opening and closing
+			categoryWrapper.addEventListener("click", () => {
+				categoryArrowElement.classList.toggle("collapsed");
+			});
+		}
+
+		category.channels.forEach((channel) => {
+			const channelContainer = document.createElement("li");
+			channelList.appendChild(channelContainer);
+			channelContainer.classList.add("channelContainer");
+			channelContainer.id = channel.id;
+
+			const channelWrapper = document.createElement("div");
+			channelContainer.appendChild(channelWrapper);
+			channelWrapper.classList.add("channelWrapper");
+
+			const channelContent = document.createElement("div");
+			channelWrapper.appendChild(channelContent);
+			channelContent.classList.add("channelContent");
+
+			// Create the channel icon
+			const channelIconElement = new DOMParser().parseFromString(
+				fs.readFileSync(`./resources/icons/channels/${channelIconName(channel)}.svg`, "utf8"),
+				"text/html",
+			).body.firstElementChild;
+			channelContent.appendChild(channelIconElement);
+			channelIconElement.classList.add("channelIcon");
+
+			// Create the channel name
+			const channelNameElement = document.createElement("div");
+			channelContent.appendChild(channelNameElement);
+			channelNameElement.classList.add("channelName");
+			channelNameElement.innerText = channel.name;
+
 			if (
-				!g.members.me.permissionsIn(c).has(Discord.PermissionFlagsBits.ViewChannel) ||
+				channel.permissionOverwrites.cache
+					.get(bot.user.id)
+					?.deny.has(Discord.PermissionFlagsBits.ViewChannel) ||
 				(bot.hideUnallowed &&
-					!g.members.cache.get(bot.owner.id).permissionsIn(c).has(Discord.PermissionFlagsBits.ViewChannel))
+					channel.permissionOverwrites.cache
+						.get(bot.owner.id)
+						?.deny.has(Discord.PermissionFlagsBits.ViewChannel))
 			) {
-				blocked = true;
-				div.classList.add("blocked");
-			}
+				channelContainer.classList.add("channelBlocked");
+			} else {
+				// Create click event
+				channelContainer.addEventListener("click", () => {
+					if (channel.id !== currentSelectedChannelId) {
+						// Remove all selected attributes
+						document
+							// eslint-disable-next-line quotes
+							.querySelectorAll('[data-selected="true"]')
+							.forEach((element) => element.removeAttribute("data-selected"));
 
-			// Create the svg icon
-			let svg = document.createElement("img");
-			// svg.type = "image/svg+xml";
-			// svg.data
-			svg.src = `./resources/icons/${Discord.ChannelType[c.type]}Channel${blocked ? "Blocked" : ""}.svg`;
-			svg.classList.add("channelSVG");
-			svg.classList.add(Discord.ChannelType[c.type]);
-			div.appendChild(svg);
+						settings.lastChannels = { [guild.id]: channel.id };
 
-			// Add the text
-			let channelName = document.createElement("h5");
-			channelName.classList.add("viewableText");
-			channelName.innerText = c.name;
-			div.appendChild(channelName);
-
-			// Finally, add it to the parent
-			if (c.parentId) document.getElementById(c.parentId).getElementsByTagName("div")[1].appendChild(div);
-			else realParent.insertBefore(div, realParent.querySelector(".category"));
-
-			if (!blocked) {
-				// Open the channel if it's stored in the database as last opened
-				if (settings.guilds[settings.lastGuild] === c.id) {
-					channelSelect(c, div);
-					openedDefaultChannel = true;
-				}
-
-				if (global.selectedChanDiv && div.id === selectedChanDiv.id) {
-					div.classList.add("selectedChan");
-					selectedChanDiv = div;
-				}
-				div.addEventListener("click", (event) => {
-					let previous = realParent.querySelector(".selectedChan");
-					let id;
-					if (previous) {
-						id = previous.id;
-						if (id !== c.id) previous.classList.remove("selectedChan");
-					}
-
-					if (id !== c.id) {
-						// Set the channel as the last channel in the guild
-						settings.guilds = (() => {
-							let obj = {};
-							obj[c.guild.id] = c.id;
-							return { ...obj };
-						})();
-
-						div.classList.add("selectedChan");
-						channelSelect(c, div);
+						channelContainer.dataset.selected = "true";
+						channelSelect(channel);
 					}
 				});
 			}
 		});
+	});
 
-	if (!openedDefaultChannel) {
-		let chan = g.channels.cache
-			.filter((c) => Discord.Constants.TextBasedChannelTypes.includes(c.type))
-			.filter((c) => g.members.me.permissionsIn(c).has(Discord.PermissionFlagsBits.ViewChannel))
-			.sort((a, b) => a.rawPosition - b.rawPosition)
-			.first();
+	// Open previous selected channel
+	const selectedChannelDiv = document.getElementById(currentSelectedChannelId);
+	if (selectedChannelDiv && !selectedChannelDiv.classList.contains("channelBlocked")) {
+		selectedChannelDiv.dataset.selected = "true";
 
-		// Check if chan exists
-		if (chan === undefined) console.error("No available text channel to open");
-		else {
-			// Select the first available channel
-			let div = document.getElementById(chan.id);
-			div.classList.add("selectedChan");
-			channelSelect(chan, div);
-		}
+		channelSelect(guild.channels.cache.get(currentSelectedChannelId));
+	} else settings.lastChannels[guild.id] = null;
+}
+
+function channelIconName(channel) {
+	let iconName = Discord.ChannelType[channel.type];
+
+	if (channel.nsfw) iconName += "NSFW";
+	else if (
+		channel.permissionOverwrites.cache
+			.get(channel.guild.id)
+			?.deny?.has(Discord.PermissionFlagsBits.ViewChannel)
+	) {
+		iconName += "Blocked";
 	}
+	if (channel.threads?.cache.size) iconName += "Threads";
+
+	switch (iconName) {
+		// Forums
+		case "GuildForum":
+		case "GuildForumThreads":
+			iconName = "GuildForum";
+			break;
+		case "GuildForumBlocked":
+		case "GuildForumBlockedThreads":
+			iconName = "GuildForumBlocked";
+			break;
+		// Announcements
+		case "GuildNews":
+			iconName = "GuildNews";
+			break;
+		case "GuildNewsBlocked":
+			iconName = "GuildNewsBlocked";
+			break;
+		case "GuildNewsThreads":
+			iconName = "GuildNewsThreads";
+			break;
+		case "GuildNewsNSFW":
+			iconName = "GuildNewsNSFW";
+			break;
+		case "GuildNewsNSFWThreads":
+			iconName = "GuildNewsNSFWThreads";
+			break;
+		// Stages
+		case "GuildStageVoice":
+		case "GuildStageVoiceNSFW":
+			iconName = "GuildStageVoice";
+			break;
+		case "GuildStageVoiceBlocked":
+			iconName = "GuildStageVoiceBlocked";
+			break;
+		// Texts
+		case "GuildText":
+			iconName = "GuildText";
+			break;
+		case "GuildTextBlocked":
+			iconName = "GuildTextBlocked";
+			break;
+		case "GuildTextThreads":
+			iconName = "GuildTextThreads";
+			break;
+		case "GuildTextNSFW":
+			iconName = "GuildTextNSFW";
+			break;
+		case "GuildTextNSFWThreads":
+			iconName = "GuildTextNSFWThreads";
+			break;
+		// Voices
+		case "GuildVoice":
+		case "GuildVoiceNSFW":
+			iconName = "GuildVoice";
+			break;
+		case "GuildVoiceBlocked":
+			iconName = "GuildVoiceBlocked";
+			break;
+
+		default:
+			break;
+	}
+
+	if (channel.guild.rulesChannelId === channel.id) iconName = "Rules";
+	if (
+		Discord.Constants.VoiceBasedChannelTypes.includes(channel.type) &&
+		channel.permissionOverwrites.cache.get(bot.user.id)?.deny.has(Discord.PermissionFlagsBits.Connect)
+	) {
+		iconName = "VoiceLocked";
+	}
+
+	return iconName;
 }

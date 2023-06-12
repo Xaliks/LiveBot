@@ -21,9 +21,7 @@ let jsonSettings = require("./json/settings.json");
 
 let selectedGuild;
 let selectedChan;
-let selectedChanDiv;
 let selectedVoice;
-let selectedChatDiv;
 let oldimg;
 let barry = false;
 

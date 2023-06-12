@@ -12,6 +12,8 @@ module.exports = {
 
 	plugins: ["n", "prettier"],
 
+	ignorePatterns: ["js/libs/*"],
+
 	rules: {
 		curly: ["error", "multi-line"],
 		"default-case": "error",

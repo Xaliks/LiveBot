@@ -158,7 +158,6 @@ function removeGuild(g) {
 		(selectedChan.guild.deleted || !selectedChan.guild.available)
 	) {
 		selectedChan = undefined;
-		selectedChatDiv = undefined;
 	}
 	// Remove the guild element from the guild list
 	guildElement.parentElement.removeChild(guildElement);

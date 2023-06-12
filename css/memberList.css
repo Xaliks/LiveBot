@@ -71,10 +71,18 @@ limitations under the License. */
     border-radius: 50%;
     display: inline-block;
     margin-right: 7px;
-    -webkit-mask-image: url("../resources/icons/PFPMask.svg");
     mask-image: url("../resources/icons/PFPMask.svg");
-    -webkit-mask-size: contain;
     mask-size: contain;
+}
+
+.userUsername {
+    font-family: Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 100;
+    font-size: 16px;
+
+    color: #8e9297;
+
+    flex: 1 1 auto;
 }
 
 .mLUsername {
@@ -82,6 +90,7 @@ limitations under the License. */
     font-weight: 100;
     font-size: 16px;
     color: #8e9297;
+
     margin: 10px 0 0 0;
     padding: 0;
     display: inline-block;

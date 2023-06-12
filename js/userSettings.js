@@ -47,18 +47,32 @@ let settings = {
 		this.settings = { defaultToken: token };
 	},
 
+	get dms() {
+		return this.tokenSettings.dms;
+	},
+	set dms(value) {
+		this.tokenSettings = { dms: value };
+	},
+
 	get lastGuild() {
 		return this.tokenSettings.lastGuild;
 	},
-	set lastGuild(guild) {
-		this.tokenSettings = { lastGuild: guild };
+	set lastGuild(id) {
+		this.tokenSettings = { lastGuild: id };
 	},
 
-	get guilds() {
-		return this.tokenSettings.guilds;
+	get lastDM() {
+		return this.tokenSettings.lastDM;
 	},
-	set guilds(guild) {
-		this.tokenSettings = { guilds: { ...this.guilds, ...guild } };
+	set lastDM(id) {
+		this.tokenSettings = { lastDM: id };
+	},
+
+	get lastChannels() {
+		return this.tokenSettings.lastChannels;
+	},
+	set lastChannels(guild) {
+		this.tokenSettings = { lastChannels: { ...this.lastChannels, ...guild } };
 	},
 
 	get settings() {
@@ -94,7 +108,8 @@ let settings = {
 		let tokenSettings = this.settings.tokenSettings[this.token];
 
 		if (tokenSettings === null) tokenSettings = {};
-		if (tokenSettings.guilds === null) tokenSettings.guilds = {};
+		if (tokenSettings.lastChannels === null) tokenSettings.lastChannels = {};
+		if (tokenSettings.lastDM === null) tokenSettings.lastDM = "";
 		if (tokenSettings.lastGuild === null) tokenSettings.lastGuild = "";
 		if (tokenSettings.teamUser === null) tokenSettings.teamUser = "";
 

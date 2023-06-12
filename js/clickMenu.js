@@ -69,7 +69,7 @@ function addDocListener() {
 				return rcMenu.classList.remove("open");
 			}
 			// Get the message block containing the message
-			let domElements = ["messageBlock", "mLUserDiv", "messageUsername", "messageImg", "dmChannel"];
+			let domElements = ["messageBlock", "mLUserDiv", "messageUsername", "messageImg", "dmChannelContainer"];
 			// Find if a distant child of certain parent
 			while (!domElements.some((r) => target.classList.contains(r)) && target !== document.body) {
 				target = target.parentElement;
@@ -193,7 +193,7 @@ function buildUserMenu(target) {
 	let dm = target.parentElement.parentElement.classList.contains("dms");
 	let id = target.id ? target.id : target.parentElement.parentElement.classList[1];
 
-	if (target.classList.contains("dmChannel")) {
+	if (target.classList.contains("dmChannelContainer")) {
 		guild = false;
 		dm = true;
 	}

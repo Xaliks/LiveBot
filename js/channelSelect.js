@@ -14,31 +14,13 @@
 
 "use strict";
 
-let channelSelect = (c, name) => {
+let channelSelect = (c) => {
 	let messages = document.getElementById("message-list");
 	let fetchSize = 100;
 
 	if (!Discord.Constants.TextBasedChannelTypes.includes(c.type)) return (selectedVoice = c);
 
 	selectedChan = c;
-
-	if (name) {
-		selectedChanDiv = name;
-		name.style.color = "#eee";
-
-		// Remove the notification class
-		name.classList.remove("newMsg");
-
-		// Set color of the channel
-		selectedChanDiv.style.color = "#606266";
-		name.addEventListener("mouseover", () => {
-			if (name.style.color !== "rgb(238, 238, 238)") name.style.color = "#B4B8BC";
-		});
-
-		name.addEventListener("mouseleave", () => {
-			if (name.style.color !== "rgb(238, 238, 238)") name.style.color = "#606266";
-		});
-	}
 
 	// Clear the messages
 	messages.replaceChildren();
@@ -94,20 +76,4 @@ let channelSelect = (c, name) => {
 		// Remove the loading dots
 		messages.removeChild(document.getElementById("loading-container"));
 	}
-};
-
-let dmChannelSelect = async (u) => {
-	if (u.bot || bot.user === u) return;
-
-	let c = u.dmChannel;
-	if (!c) c = await u.createDM();
-
-	if (!u.openDM) u.openDM = true;
-
-	if (selectedChatDiv) {
-		selectedChatDiv.classList.remove("selectedChan");
-		selectedChatDiv = undefined;
-	}
-
-	channelSelect(c, selectedChatDiv);
 };

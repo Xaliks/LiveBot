@@ -118,7 +118,14 @@ function copyMessageID(id) {
 // -------- USER MENU --------
 
 function dmUser(user) {
-	dmChannelSelect(user);
+	if (!user || user.bot || user.system || user.id === bot.user.id) return;
+
+	settings.lastDM = user.id;
+	if (!settings.dms.find(({ id }) => id === user.id)) {
+		settings.dms = settings.dms.concat({ id: user.id, lastmessage: "" });
+	}
+
+	dmList();
 }
 
 function mentionUser(id) {

@@ -50,8 +50,8 @@ async function addMemberList(guild) {
 			if (!member.presence || member.presence.status === "offline") {
 				if (members.size < 1000) role = roles.get("offline");
 				else return;
-			} else if (member.roles.hoist) role = roles.get(member.roles.hoist.id);
-			else if (member.presence.status !== "offline") role = roles.get("online");
+			} else if (!member.roles.hoist) role = roles.get("online");
+			else role = roles.get(member.roles.hoist.id);
 
 			if (!role.container) {
 				role.container = document.createElement("div");
@@ -92,8 +92,7 @@ async function addMemberList(guild) {
 			// Make the username text
 			let username = document.createElement("p");
 			username.classList.add("mLUsername");
-			let name = member.displayName;
-			username.innerText = name;
+			username.innerText = member.displayName;
 			username.style.color = member.roles.color?.hexColor || "#8E9297";
 			userDiv.appendChild(username);
 		});
